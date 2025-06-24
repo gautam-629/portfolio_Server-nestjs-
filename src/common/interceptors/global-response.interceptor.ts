@@ -18,7 +18,8 @@ export interface Response<T> {
 
 @Injectable()
 export class GlobalResponseInterceptor<T>
-  implements NestInterceptor<T, Response<T>> {
+  implements NestInterceptor<T, Response<T>>
+{
   constructor(private readonly reflector: Reflector) {}
 
   intercept(

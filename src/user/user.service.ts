@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { CreateuserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from './entity/user.entity';
+import { plainToInstance } from 'class-transformer';
+import { UserResponseDto } from './dto/user-response.dto';
 
 @Injectable()
 export class UserService {
@@ -20,12 +22,25 @@ export class UserService {
       .getOne(); // Use getOne to return the first match
   }
 
+  async findById(id: string): Promise<UserResponseDto | null> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id })
+      .getOne();
+
+    if (!user) return null;
+
+    return plainToInstance(UserResponseDto, user, {
+      excludeExtraneousValues: false,
+    });
+  }
+
   // Using QueryBuilder to insert a new user
-  async create(createUserDto: CreateuserDto): Promise<User | null> {
+  async create(createUserDto: CreateuserDto): Promise<UserResponseDto | null> {
     const { password, ...userData } = createUserDto;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await this.userRepository
+    const insertResult = await this.userRepository
       .createQueryBuilder()
       .insert()
       .into(User)
@@ -35,7 +50,8 @@ export class UserService {
       })
       .execute();
 
-    // Optionally fetch and return the newly created user
-    return this.findByEmail(createUserDto.email);
+    const insertUseId = insertResult.identifiers[0]?.id;
+
+    return this.findById(insertUseId);
   }
 }

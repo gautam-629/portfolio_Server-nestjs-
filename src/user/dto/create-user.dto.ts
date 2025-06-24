@@ -22,7 +22,7 @@ export class CreateuserDto {
   @IsNotEmpty()
   firstName: string;
 
-   @IsString()
+  @IsString()
   @IsNotEmpty()
   lastName: string;
 
