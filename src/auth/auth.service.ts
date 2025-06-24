@@ -1,15 +1,26 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateuserDto } from 'src/user/dto/create-user.dto';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
+import { AuthJwtPayload } from 'src/common/types';
+import { JwtService } from '@nestjs/jwt';
+import refreshConfig from './config/refresh.config';
+import { ConfigType } from '@nestjs/config';
+import { hash } from 'argon2';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userservice: UserService) {}
+  constructor(
+    private readonly userservice: UserService,
+    private readonly jwtService: JwtService,
+    @Inject(refreshConfig.KEY)
+    private refreshTokenConfig: ConfigType<typeof refreshConfig>,
+  ) {}
 
   async registerUser(createUserDto: CreateuserDto) {
     const user = await this.userservice.findByEmail(createUserDto.email);
@@ -20,9 +31,7 @@ export class AuthService {
   }
 
   async validateLocalUser(email: string, password: string) {
-
     const user = await this.userservice.findByEmail(email);
-
 
     if (!user) {
       throw new UnauthorizedException('User not Found!');
@@ -35,5 +44,38 @@ export class AuthService {
     }
 
     return { id: user.id, role: user.role };
+  }
+
+  async login(userId: string) {
+    const { accessToken, refreshToken } = await this.generateTokens(
+      Number(userId),
+    );
+
+    const hashRt = await hash(refreshToken);
+
+    await this.userservice.updateHashedRefreshToken(userId, hashRt);
+
+    return {
+      id: userId,
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  async generateTokens(userId: number) {
+    const payload: AuthJwtPayload = {
+      sub: userId,
+    };
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload),
+      this.jwtService.signAsync(payload, this.refreshTokenConfig),
+    ]);
+
+    console.log(accessToken, refreshToken);
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }

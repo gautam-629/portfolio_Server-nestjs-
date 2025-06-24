@@ -54,4 +54,13 @@ export class UserService {
 
     return this.findById(insertUseId);
   }
+
+  async updateHashedRefreshToken(userid: string, hashedRT: string | null) {
+    return await this.userRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({ refreshToken: hashedRT })
+      .where('id = :id', { id: userid })
+      .execute();
+  }
 }
