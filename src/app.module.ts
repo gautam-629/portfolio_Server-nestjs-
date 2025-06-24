@@ -12,11 +12,11 @@ import { UserModule } from './user/user.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal:true
+      isGlobal: true,
     }),
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),
     AuthModule,
-    UserModule
+    UserModule,
   ],
   controllers: [AppController, AuthController],
   providers: [AppService, AuthService],
