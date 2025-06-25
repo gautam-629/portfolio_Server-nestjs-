@@ -22,4 +22,7 @@ export class UserResponseDto {
 
   @Expose()
   updatedAt: Date;
+
+  @Expose()
+  refreshToken: string;
 }

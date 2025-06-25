@@ -11,7 +11,7 @@ import { AuthJwtPayload } from 'src/common/types';
 import { JwtService } from '@nestjs/jwt';
 import refreshConfig from './config/refresh.config';
 import { ConfigType } from '@nestjs/config';
-import { hash } from 'argon2';
+import { hash, verify } from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -47,9 +47,7 @@ export class AuthService {
   }
 
   async login(userId: string) {
-    const { accessToken, refreshToken } = await this.generateTokens(
-      Number(userId),
-    );
+    const { accessToken, refreshToken } = await this.generateTokens(userId);
 
     const hashRt = await hash(refreshToken);
 
@@ -62,7 +60,7 @@ export class AuthService {
     };
   }
 
-  async generateTokens(userId: number) {
+  async generateTokens(userId: string) {
     const payload: AuthJwtPayload = {
       sub: userId,
     };
@@ -71,9 +69,48 @@ export class AuthService {
       this.jwtService.signAsync(payload, this.refreshTokenConfig),
     ]);
 
-    console.log(accessToken, refreshToken);
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  async validateJwtUser(userId: string) {
+    const user = await this.userservice.findById(userId);
+
+    if (!user) {
+      throw new UnauthorizedException('User not found!');
+    }
+
+    const currentUser = { id: user.id, role: user.role };
+
+    return currentUser;
+  }
+
+  async validateRefreshToken(userId: string, refreshToken: string) {
+    const user = await this.userservice.findById(userId);
+
+    if (!user) throw new UnauthorizedException('User not found');
+
+    const refreshTokenMatch = await verify(user.refreshToken, refreshToken);
+
+    if (!refreshTokenMatch)
+      throw new UnauthorizedException('Invalid Refresh Token!');
+
+    const currentUser = { id: user.id, role: user.role };
+
+    return currentUser;
+  }
+
+  async refreshToken(userId: string) {
+    const { accessToken, refreshToken } = await this.generateTokens(userId);
+
+    const hashRT = await hash(refreshToken);
+
+    await this.userservice.updateHashedRefreshToken(userId, hashRT);
 
     return {
+      id: userId,
       accessToken,
       refreshToken,
     };
