@@ -9,7 +9,7 @@ import {
 import { Role } from '../../common/enums/roles.enum';
 import { ProfilePicture } from '../../profile/entity/profile.entity';
 
-@Entity()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: number;
