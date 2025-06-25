@@ -31,7 +31,7 @@ export class UserService {
     if (!user) return null;
 
     return plainToInstance(UserResponseDto, user, {
-      excludeExtraneousValues: false,
+      excludeExtraneousValues: true,
     });
   }
 

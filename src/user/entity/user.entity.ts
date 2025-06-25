@@ -2,10 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Role } from '../../common/enums/roles.enum';
+import { ProfilePicture } from '../../profile/entity/profile.entity';
 
 @Entity()
 export class User {
@@ -39,4 +41,7 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(()=>ProfilePicture,(picture)=>picture.user)
+  profilePictures:ProfilePicture[]
 }

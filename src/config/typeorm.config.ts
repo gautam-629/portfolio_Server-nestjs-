@@ -1,11 +1,11 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
-  TypeOrmModule,
   TypeOrmModuleAsyncOptions,
   TypeOrmModuleOptions,
 } from '@nestjs/typeorm';
 import { User } from '../user/entity/user.entity';
 import { DataSource, DataSourceOptions } from 'typeorm';
+import { ProfilePicture } from '../profile/entity/profile.entity';
 export const typeOrmConfigAsync: TypeOrmModuleAsyncOptions = {
   imports: [ConfigModule],
   useFactory: async (
@@ -31,7 +31,7 @@ export const dataSourceOptions: DataSourceOptions = {
   username: process.env.DB_USERNAME || 'root',
   password: process.env.DB_PASSWORD || '12345',
   database: process.env.DB_DATABASE || 'blog',
-  entities: [User],
+  entities: [User,ProfilePicture],
   migrations: ['src/migrations/*{.ts,.js}'],
   synchronize: false,
 };
