@@ -44,4 +44,9 @@ export class AuthController {
      return this.authServices.login(req.user.id)
   }
 
+  @Post('signout')
+  signOut(@Request() req){
+    return this.authServices.signOut(req.user.id)
+  }
+
 }
