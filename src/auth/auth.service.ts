@@ -131,4 +131,8 @@ export class AuthService {
 
     return await this.userservice.create(googleUser);
   }
+
+  async signOut(userId:string){
+       return await this.userservice.updateHashedRefreshToken(userId,null)
+  }
 }
