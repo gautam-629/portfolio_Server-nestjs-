@@ -9,7 +9,7 @@ import { Role } from '../../common/enums/roles.enum';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: number;
 
   @Column({ unique: true })
