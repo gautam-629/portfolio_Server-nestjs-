@@ -53,8 +53,16 @@ export class AuthService {
 
     await this.userservice.updateHashedRefreshToken(userId, hashRt);
 
+    const user=await this.userservice.findById(userId)
+
     return {
-      id: userId,
+      user:{
+         id:userId,
+         firstName:user?.firstName,
+         lastName:user?.lastName,
+         role:user?.role,
+         email:user?.email
+      },
       accessToken,
       refreshToken,
     };
@@ -114,5 +122,13 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
+  }
+
+  async validateGoogleUser(googleUser: CreateuserDto) {
+    const user = await this.userservice.findByEmail(googleUser.email);
+
+    if (user) return user;
+
+    return await this.userservice.create(googleUser);
   }
 }

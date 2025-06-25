@@ -1,12 +1,11 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateuserDto } from 'src/user/dto/create-user.dto';
 import { Message } from 'src/common/decorator/message.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Public } from 'src/common/decorator/public.decorator';
-import { Roles } from 'src/common/decorator/roles.decorator';
-import { Role } from 'src/common/enums/roles.enum';
 import { RefreshAuthGuard } from './guards/refresh-auth.guard';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -27,11 +26,22 @@ export class AuthController {
   }
 
   @Public()
-   @UseGuards(RefreshAuthGuard)
-   @Post('refresh')
-   refreshToken(@Request() req){
-     return this.authServices.refreshToken(req.user.id)
-   }
+  @UseGuards(RefreshAuthGuard)
+  @Post('refresh')
+  refreshToken(@Request() req) {
+    return this.authServices.refreshToken(req.user.id);
+  }
 
-   
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  @Get('google/auth')
+  googleLogin(){}
+
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  @Get('google/callback')
+  googleCallBack(@Request() req){
+     return this.authServices.login(req.user.id)
+  }
+
 }
