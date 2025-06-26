@@ -1,4 +1,4 @@
-import { Controller, HttpException, HttpStatus, Request , Post, UploadedFile } from '@nestjs/common';
+import { Controller, HttpException, HttpStatus, Request , Post, UploadedFile, Get, Req } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { ProfilePictureUpload } from 'src/common/decorator/file-upload.decorator';
 import { CreateProfilePictureDto } from './dto/create-profile.dto';
@@ -23,5 +23,9 @@ export class ProfileController {
 
       return await this.profileService.create(createDto)
     
+   }
+   @Get()
+   async findAll(){
+        return await this.profileService.findAll();
    }
 }

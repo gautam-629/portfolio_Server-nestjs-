@@ -7,6 +7,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfigAsync } from './config/typeorm.config';
 import { UserModule } from './user/user.module';
 import { ProfileModule } from './profile/profile.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -14,6 +16,12 @@ import { ProfileModule } from './profile/profile.module';
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),
+
+    ServeStaticModule.forRoot({
+      rootPath:join(process.cwd(),'uploads'),
+      serveRoot:'/uploads'
+    }),
+
     AuthModule,
     UserModule,
     ProfileModule,

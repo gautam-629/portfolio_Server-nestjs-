@@ -3,6 +3,9 @@ import { CreateProfilePictureDto } from './dto/create-profile.dto';
 import { ProfilePicture } from './entity/profile.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { plainToInstance } from 'class-transformer';
+import { ProfileDto } from './dto/profile-response.dto';
+import { domain } from 'src/common/const';
 
 @Injectable()
 export class ProfileService {
@@ -58,6 +61,37 @@ export class ProfileService {
     throw new HttpException(
       `Failed to create profile picture: ${error.message}`,
       HttpStatus.INTERNAL_SERVER_ERROR
+    );
+  } finally {
+    await queryRunner.release();
+  }
+}
+
+async findAll() {
+  const queryRunner = this.dataSource.createQueryRunner();
+  await queryRunner.connect();
+
+  try {
+    await queryRunner.startTransaction();
+
+    const profile = await queryRunner.query(`
+      SELECT pp.id, pp.imageUrl, u.email, u.firstName, u.lastName 
+      FROM profile_pictures pp 
+      LEFT JOIN users u ON pp.userId = u.id;
+    `);
+
+    await queryRunner.commitTransaction();
+
+    return plainToInstance(ProfileDto, profile, {
+      excludeExtraneousValues: true,
+    });
+
+  } catch (error) {
+    console.log(error)
+    await queryRunner.rollbackTransaction();
+    throw new HttpException(
+      `Failed to fetch profile, ${error.message}`,
+      HttpStatus.INTERNAL_SERVER_ERROR,
     );
   } finally {
     await queryRunner.release();
