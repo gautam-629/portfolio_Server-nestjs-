@@ -3,7 +3,7 @@ import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } f
 
 @Entity('profile_pictures')
 export class ProfilePicture{
-   @PrimaryGeneratedColumn('uuid')
+   @PrimaryGeneratedColumn()
    id:string
 
    @Column()

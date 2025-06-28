@@ -11,7 +11,7 @@ import { ProfilePicture } from '../../profile/entity/profile.entity';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ unique: true })

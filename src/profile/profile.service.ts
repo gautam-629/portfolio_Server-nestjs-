@@ -6,6 +6,10 @@ import { DataSource } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { ProfileDto } from './dto/profile-response.dto';
 import { domain } from 'src/common/const';
+import { use } from 'passport';
+import * as path from 'path';
+import * as fs from 'fs'
+import { resourceUsage } from 'process';
 
 @Injectable()
 export class ProfileService {
@@ -32,6 +36,7 @@ export class ProfileService {
     if (!userExists.length) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
+
 
     // ✅ Insert profile picture
     await queryRunner.query(
@@ -96,6 +101,58 @@ async findAll() {
   } finally {
     await queryRunner.release();
   }
+}
+
+async deleteProfilePicture(userId:string,profileId:string){
+   const queryRunner=await this.dataSource.createQueryRunner();
+   await queryRunner.connect();
+
+   try {
+    await queryRunner.startTransaction()
+
+    //find profile picture details
+    const  profilePicture=await queryRunner.query(`
+      SELECT id,imageUrl from profile_pictures WHERE id=?
+      `,[profileId])
+
+
+    if(!profilePicture.length){
+      throw new HttpException("Profile Not Found",HttpStatus.NOT_FOUND)
+    }
+
+  
+    const deleteRecord= await queryRunner.query(`DELETE FROM profile_pictures WHERE id=?`,[profileId]);
+
+    if(deleteRecord[0]===0){
+      throw new HttpException('Profile Picture not Found',HttpStatus.NOT_FOUND)
+    }
+
+    console.log(profilePicture[0])
+
+    //delete the profile from filesystem
+    if(profilePicture[0].imageUrl){
+      const filePath=path.join(`${process.cwd()}${profilePicture[0].imageUrl}`);
+
+      if(fs.existsSync(filePath)){
+         fs.unlinkSync(filePath)
+      }
+    }
+
+    await queryRunner.commitTransaction();
+
+
+    return {userId:userId,profileId:profileId}
+
+    
+   } catch (error) {
+      console.log(error)
+      await queryRunner.rollbackTransaction()
+      throw new HttpException(`Failed to Delete Profile Picture ${error.message}`,HttpStatus.INTERNAL_SERVER_ERROR)
+   }
+   finally{
+    await queryRunner.release()
+   }
+
 }
 
 }
