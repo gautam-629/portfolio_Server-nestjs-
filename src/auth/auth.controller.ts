@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateuserDto } from 'src/user/dto/create-user.dto';
 import { Message } from 'src/common/decorator/message.decorator';
@@ -35,18 +42,17 @@ export class AuthController {
   @Public()
   @UseGuards(GoogleAuthGuard)
   @Get('google/auth')
-  googleLogin(){}
+  googleLogin() {}
 
   @Public()
   @UseGuards(GoogleAuthGuard)
   @Get('google/callback')
-  googleCallBack(@Request() req){
-     return this.authServices.login(req.user.id)
+  googleCallBack(@Request() req) {
+    return this.authServices.login(req.user.id);
   }
 
   @Post('signout')
-  signOut(@Request() req){
-    return this.authServices.signOut(req.user.id)
+  signOut(@Request() req) {
+    return this.authServices.signOut(req.user.id);
   }
-
 }

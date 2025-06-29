@@ -1,9 +1,10 @@
-import { Controller, HttpException, HttpStatus, Request , Post, UploadedFile, Get, Req, Delete, Param } from '@nestjs/common';
+import { Controller, HttpException, HttpStatus, Request , Post, UploadedFile, Get, Delete, Param, Patch } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { ProfilePictureUpload } from 'src/common/decorator/file-upload.decorator';
 import { CreateProfilePictureDto } from './dto/create-profile.dto';
 import { Public } from 'src/common/decorator/public.decorator';
 import { Message } from 'src/common/decorator/message.decorator';
+import { UpdateProfilePictureDto } from './dto/update-profile.dto';
 
 @Controller('profile')
 export class ProfileController {
@@ -44,7 +45,26 @@ export class ProfileController {
 
   }
 
+@Message("Successfully  updated Profile Picture")
+@Patch(":id")
+@ProfilePictureUpload()
+async UpdateProfilePicture(
+   @Request() req,
+   @Param() params:{id:string},
+   @UploadedFile() file:Express.Multer.File
+){
 
+   if(!file){
+      throw new HttpException(`File Not Found`,HttpStatus.NOT_FOUND)
+   }
+
+   const updateProfileDto:UpdateProfilePictureDto={
+       imageUrl:`/uploads/profile-pictures/${file.filename}`,
+   }
+
+
+  return await this.profileService.UpdateProfilePicture(req.user.id,params.id,updateProfileDto)
+}
  
    
 }

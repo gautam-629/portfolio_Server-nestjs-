@@ -42,6 +42,6 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(()=>ProfilePicture,(picture)=>picture.user)
-  profilePictures:ProfilePicture[]
+  @OneToMany(() => ProfilePicture, (picture) => picture.user)
+  profilePictures: ProfilePicture[];
 }

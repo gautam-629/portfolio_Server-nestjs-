@@ -31,7 +31,7 @@ export const dataSourceOptions: DataSourceOptions = {
   username: process.env.DB_USERNAME || 'root',
   password: process.env.DB_PASSWORD || '12345',
   database: process.env.DB_DATABASE || 'blog',
-  entities: [User,ProfilePicture],
+  entities: [User, ProfilePicture],
   migrations: ['src/migrations/*{.ts,.js}'],
   synchronize: false,
 };

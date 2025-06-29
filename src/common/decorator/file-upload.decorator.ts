@@ -1,15 +1,20 @@
-import { applyDecorators, HttpException, HttpStatus, UseInterceptors } from "@nestjs/common";
-import { FileUploadOptions } from "../types/fileUpload";
-import { FileInterceptor } from "@nestjs/platform-express";
-import { diskStorage } from "multer";
-import { extname } from "path";
+import {
+  applyDecorators,
+  HttpException,
+  HttpStatus,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileUploadOptions } from '../types/fileUpload';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 export const FileUpload = (options: FileUploadOptions = {}) => {
   const {
     destination = './uploads',
     allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'],
     maxFileSize = 5 * 1024 * 1024, // 5MB default
-    fieldName = 'file'
+    fieldName = 'file',
   } = options;
 
   return applyDecorators(
@@ -18,19 +23,25 @@ export const FileUpload = (options: FileUploadOptions = {}) => {
         storage: diskStorage({
           destination,
           filename: (req, file, cb) => {
-            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-            cb(null, `${file.fieldname}-${uniqueSuffix}${extname(file.originalname)}`);
+            const uniqueSuffix =
+              Date.now() + '-' + Math.round(Math.random() * 1e9);
+            cb(
+              null,
+              `${file.fieldname}-${uniqueSuffix}${extname(file.originalname)}`,
+            );
           },
         }),
         fileFilter: (req, file, cb) => {
-          const fileExtension = extname(file.originalname).toLowerCase().slice(1);
+          const fileExtension = extname(file.originalname)
+            .toLowerCase()
+            .slice(1);
           if (!allowedExtensions.includes(fileExtension)) {
             return cb(
               new HttpException(
                 `Only ${allowedExtensions.join(', ')} files are allowed!`,
-                HttpStatus.BAD_REQUEST
+                HttpStatus.BAD_REQUEST,
               ),
-              false
+              false,
             );
           }
           cb(null, true);
@@ -38,12 +49,10 @@ export const FileUpload = (options: FileUploadOptions = {}) => {
         limits: {
           fileSize: maxFileSize,
         },
-      })
-    )
+      }),
+    ),
   );
 };
-
-
 
 // Specific decorator for profile pictures
 export const ProfilePictureUpload = () => {
@@ -51,7 +60,7 @@ export const ProfilePictureUpload = () => {
     destination: './uploads/profile-pictures',
     allowedExtensions: ['jpg', 'jpeg', 'png', 'gif'],
     maxFileSize: 5 * 1024 * 1024, // 5MB
-    fieldName: 'file'
+    fieldName: 'file',
   });
 };
 
@@ -61,7 +70,7 @@ export const DocumentUpload = () => {
     destination: './uploads/documents',
     allowedExtensions: ['pdf', 'doc', 'docx', 'txt'],
     maxFileSize: 10 * 1024 * 1024, // 10MB
-    fieldName: 'document'
+    fieldName: 'document',
   });
 };
 
@@ -71,7 +80,7 @@ export const AvatarUpload = () => {
     destination: './uploads/avatars',
     allowedExtensions: ['jpg', 'jpeg', 'png'],
     maxFileSize: 2 * 1024 * 1024, // 2MB
-    fieldName: 'avatar'
+    fieldName: 'avatar',
   });
 };
 
@@ -81,18 +90,20 @@ export const ImageUpload = (destination: string = './uploads/images') => {
     destination,
     allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
     maxFileSize: 8 * 1024 * 1024, // 8MB
-    fieldName: 'image'
+    fieldName: 'image',
   });
 };
 
 // Multiple files upload decorator
-export const MultipleFileUpload = (options: FileUploadOptions & { maxCount?: number } = {}) => {
+export const MultipleFileUpload = (
+  options: FileUploadOptions & { maxCount?: number } = {},
+) => {
   const {
     destination = './uploads',
     allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'],
     maxFileSize = 5 * 1024 * 1024,
     fieldName = 'files',
-    maxCount = 5
+    maxCount = 5,
   } = options;
 
   return applyDecorators(
@@ -101,19 +112,25 @@ export const MultipleFileUpload = (options: FileUploadOptions & { maxCount?: num
         storage: diskStorage({
           destination,
           filename: (req, file, cb) => {
-            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-            cb(null, `${file.fieldname}-${uniqueSuffix}${extname(file.originalname)}`);
+            const uniqueSuffix =
+              Date.now() + '-' + Math.round(Math.random() * 1e9);
+            cb(
+              null,
+              `${file.fieldname}-${uniqueSuffix}${extname(file.originalname)}`,
+            );
           },
         }),
         fileFilter: (req, file, cb) => {
-          const fileExtension = extname(file.originalname).toLowerCase().slice(1);
+          const fileExtension = extname(file.originalname)
+            .toLowerCase()
+            .slice(1);
           if (!allowedExtensions.includes(fileExtension)) {
             return cb(
               new HttpException(
                 `Only ${allowedExtensions.join(', ')} files are allowed!`,
-                HttpStatus.BAD_REQUEST
+                HttpStatus.BAD_REQUEST,
               ),
-              false
+              false,
             );
           }
           cb(null, true);
@@ -122,7 +139,7 @@ export const MultipleFileUpload = (options: FileUploadOptions & { maxCount?: num
           fileSize: maxFileSize,
           files: maxCount,
         },
-      })
-    )
+      }),
+    ),
   );
 };

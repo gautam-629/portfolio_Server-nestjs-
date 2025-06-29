@@ -1,20 +1,20 @@
-import { Expose, Transform } from "class-transformer";
-import { domain } from "src/common/const";
+import { Expose, Transform } from 'class-transformer';
+import { domain } from 'src/common/const';
 
-export class ProfileDto{
-    @Expose()
-    id:string;
+export class ProfileDto {
+  @Expose()
+  id: string;
 
-    @Expose()
-    @Transform(({value})=>`${domain}${value}`,{toClassOnly:true})
-    imageUrl:string;
+  @Expose()
+  @Transform(({ value }) => `${domain}${value}`, { toClassOnly: true })
+  imageUrl: string;
 
-    @Expose()
-    email:string
+  @Expose()
+  email: string;
 
-    @Expose()
-    firstName:string
+  @Expose()
+  firstName: string;
 
-    @Expose()
-    lastName:String
+  @Expose()
+  lastName: String;
 }

@@ -1,10 +1,10 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { PassportStrategy } from "@nestjs/passport";
-import {Strategy, VerifyCallback} from 'passport-google-oauth20'
-import googleOauthConfig from "../config/google-oauth.config";
-import { ConfigType } from "@nestjs/config";
-import { AuthService } from "../auth.service";
-import { UserResponseDto } from "src/user/dto/user-response.dto";
+import { Inject, Injectable } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { Strategy, VerifyCallback } from 'passport-google-oauth20';
+import googleOauthConfig from '../config/google-oauth.config';
+import { ConfigType } from '@nestjs/config';
+import { AuthService } from '../auth.service';
+import { UserResponseDto } from 'src/user/dto/user-response.dto';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -14,11 +14,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     private readonly authSerice: AuthService,
   ) {
     super({
-            clientID:googleConfig.clientID!,
-            clientSecret:googleConfig.clientSecret!,
-            callbackURL:googleConfig.callbackURL!,
-             scope:['email','profile']
-        })
+      clientID: googleConfig.clientID!,
+      clientSecret: googleConfig.clientSecret!,
+      callbackURL: googleConfig.callbackURL!,
+      scope: ['email', 'profile'],
+    });
   }
 
   async validate(

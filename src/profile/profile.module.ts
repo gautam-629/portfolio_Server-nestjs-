@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProfilePicture } from './entity/profile.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([ProfilePicture])],
+  imports: [TypeOrmModule.forFeature([ProfilePicture])],
   controllers: [ProfileController],
   providers: [ProfileService],
 })

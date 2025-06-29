@@ -53,15 +53,15 @@ export class AuthService {
 
     await this.userservice.updateHashedRefreshToken(userId, hashRt);
 
-    const user=await this.userservice.findById(userId)
+    const user = await this.userservice.findById(userId);
 
     return {
-      user:{
-         id:userId,
-         firstName:user?.firstName,
-         lastName:user?.lastName,
-         role:user?.role,
-         email:user?.email
+      user: {
+        id: userId,
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        role: user?.role,
+        email: user?.email,
       },
       accessToken,
       refreshToken,
@@ -132,7 +132,7 @@ export class AuthService {
     return await this.userservice.create(googleUser);
   }
 
-  async signOut(userId:string){
-       return await this.userservice.updateHashedRefreshToken(userId,null)
+  async signOut(userId: string) {
+    return await this.userservice.updateHashedRefreshToken(userId, null);
   }
 }

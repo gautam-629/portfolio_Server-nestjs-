@@ -1,7 +1,7 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsOptional, IsString } from 'class-validator';
 
-export class UpdateProfilePictureDto{
-    @IsOptional()
-    @IsString()
-    imageUrl:string
+export class UpdateProfilePictureDto {
+  @IsOptional()
+  @IsString()
+  imageUrl: string;
 }

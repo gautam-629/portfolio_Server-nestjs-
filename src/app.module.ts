@@ -18,8 +18,8 @@ import { join } from 'path';
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),
 
     ServeStaticModule.forRoot({
-      rootPath:join(process.cwd(),'uploads'),
-      serveRoot:'/uploads'
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
     }),
 
     AuthModule,
