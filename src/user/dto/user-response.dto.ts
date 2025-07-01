@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { Role } from 'src/common/enums/roles.enum';
+import { RoleEnum } from 'src/common/enums/roles.enum';
 
 export class UserResponseDto {
   @Expose()
@@ -15,7 +15,7 @@ export class UserResponseDto {
   lastName: string;
 
   @Expose()
-  role: Role;
+  role: RoleEnum;
 
   @Expose()
   createdAt: Date;

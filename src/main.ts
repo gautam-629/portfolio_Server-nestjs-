@@ -8,7 +8,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const logger=new Logger('Bootstrap')
+  const logger = new Logger('Bootstrap');
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -22,18 +22,17 @@ async function bootstrap() {
   app.useGlobalInterceptors(new GlobalResponseInterceptor(reflector));
   app.useGlobalFilters(new GlobalExceptionFilter());
 
+  const connfig = new DocumentBuilder()
+    .setTitle('Blog Application')
+    .setDescription('This is Api Description')
+    .setVersion('1.0')
+    .addTag('blog')
+    .build();
 
-  const connfig=new DocumentBuilder()
-  .setTitle('Blog Application')
-  .setDescription('This is Api Description')
-  .setVersion('1.0')
-  .addTag('blog')
-  .build()
+  const documentFactory = () => SwaggerModule.createDocument(app, connfig);
+  SwaggerModule.setup('api', app, documentFactory);
 
-  const documentFactory=()=>SwaggerModule.createDocument(app,connfig)
-  SwaggerModule.setup('api', app, documentFactory)
-
-  const port=process.env.PORT ?? 5000
+  const port = process.env.PORT ?? 5000;
 
   await app.listen(port);
 

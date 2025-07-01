@@ -18,7 +18,7 @@ import { GoogleAuthGuard } from './guards/google-auth.guard';
 export class AuthController {
   constructor(private readonly authServices: AuthService) {}
 
-  @Message('Successfully created User')
+  @Message('Successfully signup User')
   @Public()
   @Post('signup')
   registerUser(@Body() createUserDto: CreateuserDto) {

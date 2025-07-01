@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateuserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from './entity/user.entity';
@@ -12,6 +12,8 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectDataSource()
+        private readonly dataSource: DataSource,
   ) {}
 
   // Using QueryBuilder to find a user by email
@@ -63,4 +65,24 @@ export class UserService {
       .where('id = :id', { id: userid })
       .execute();
   }
+
+async  getAll(){
+
+  try {
+    const quaryRunner=await this.dataSource.createQueryRunner()
+     await quaryRunner.connect()
+     quaryRunner.startTransaction();
+     const users= await quaryRunner.query(`SELECT * FROM users`)
+     const result=plainToInstance(UserResponseDto,users,{
+      excludeExtraneousValues:true
+     })
+
+     return result;
+
+  } catch (error) {
+     throw new HttpException(`Failed to fetch user${error.message}`,HttpStatus.BAD_REQUEST)
+  }
+
+  }
+
 }

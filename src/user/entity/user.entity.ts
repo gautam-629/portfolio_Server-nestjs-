@@ -6,8 +6,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Role } from '../../common/enums/roles.enum';
 import { ProfilePicture } from '../../profile/entity/profile.entity';
+import { RoleEnum } from 'src/common/enums/roles.enum';
 
 @Entity('users')
 export class User {
@@ -28,10 +28,10 @@ export class User {
 
   @Column({
     type: 'enum',
-    enum: Role,
-    default: Role.USER,
+    enum: RoleEnum,
+    default: RoleEnum.USER,
   })
-  role: Role;
+  role: RoleEnum;
 
   @Column({ type: 'varchar', nullable: true })
   refreshToken: string | null;

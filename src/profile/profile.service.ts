@@ -197,8 +197,11 @@ export class ProfileService {
         [updateProfileDto.imageUrl, profileId],
       );
 
-      if(updateProfilepicture.affedtedRows===0){
-        throw new HttpException(`Failed to update profile picture`,HttpStatus.BAD_REQUEST)
+      if (updateProfilepicture.affedtedRows === 0) {
+        throw new HttpException(
+          `Failed to update profile picture`,
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       await queryRunner.commitTransaction();
