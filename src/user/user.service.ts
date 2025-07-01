@@ -75,18 +75,36 @@ export class UserService {
       .execute();
   }
 
-  async getAll() {
+  async getAll(page: number, limit: number) {
+    const quaryRunner = await this.dataSource.createQueryRunner();
+    await quaryRunner.connect();
     try {
-      const quaryRunner = await this.dataSource.createQueryRunner();
-      await quaryRunner.connect();
       quaryRunner.startTransaction();
-      const users = await quaryRunner.query(`SELECT * FROM users`);
-      const result = plainToInstance(UserResponseDto, users, {
-        excludeExtraneousValues: true,
-      });
 
-      return result;
+      const offset = (page - 1) * limit;
+
+      const users = await quaryRunner.query(
+        `SELECT * FROM users LIMIT ? OFFSET ?`,
+        [limit, offset],
+      );
+
+      const totalResult = await quaryRunner.query(`SELECT COUNT(*) from users`);
+
+      const total = Number(totalResult[0]['COUNT(*)'] || 0);
+
+      await quaryRunner.commitTransaction();
+
+      return {
+        result: plainToInstance(UserResponseDto, users, {
+          excludeExtraneousValues: true,
+        }),
+        page,
+        total,
+        limit,
+        totalPage: Math.ceil(total / limit),
+      };
     } catch (error) {
+      await quaryRunner.rollbackTransaction();
       throw new HttpException(
         `Failed to fetch user${error.message}`,
         HttpStatus.BAD_REQUEST,
