@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { CreateuserDto } from './dto/create-user.dto';
@@ -13,7 +18,7 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectDataSource()
-        private readonly dataSource: DataSource,
+    private readonly dataSource: DataSource,
   ) {}
 
   // Using QueryBuilder to find a user by email
@@ -39,6 +44,10 @@ export class UserService {
 
   // Using QueryBuilder to insert a new user
   async create(createUserDto: CreateuserDto): Promise<UserResponseDto | null> {
+    const user = await this.findByEmail(createUserDto.email);
+
+    if (user) throw new ConflictException('User already Exists');
+
     const { password, ...userData } = createUserDto;
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -66,23 +75,22 @@ export class UserService {
       .execute();
   }
 
-async  getAll(){
+  async getAll() {
+    try {
+      const quaryRunner = await this.dataSource.createQueryRunner();
+      await quaryRunner.connect();
+      quaryRunner.startTransaction();
+      const users = await quaryRunner.query(`SELECT * FROM users`);
+      const result = plainToInstance(UserResponseDto, users, {
+        excludeExtraneousValues: true,
+      });
 
-  try {
-    const quaryRunner=await this.dataSource.createQueryRunner()
-     await quaryRunner.connect()
-     quaryRunner.startTransaction();
-     const users= await quaryRunner.query(`SELECT * FROM users`)
-     const result=plainToInstance(UserResponseDto,users,{
-      excludeExtraneousValues:true
-     })
-
-     return result;
-
-  } catch (error) {
-     throw new HttpException(`Failed to fetch user${error.message}`,HttpStatus.BAD_REQUEST)
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        `Failed to fetch user${error.message}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
-
-  }
-
 }
