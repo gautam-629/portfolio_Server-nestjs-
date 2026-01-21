@@ -7,11 +7,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { ProfilePicture } from '../../profile/entity/profile.entity';
-import { RoleEnum } from 'src/common/enums/roles.enum';
+import { RoleEnum } from '../../common/enums/roles.enum';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: number;
 
   @Column({ unique: true })

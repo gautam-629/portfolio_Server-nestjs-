@@ -9,7 +9,7 @@ import {
 
 @Entity('profile_pictures')
 export class ProfilePicture {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()

@@ -11,7 +11,7 @@ export const typeOrmConfigAsync: TypeOrmModuleAsyncOptions = {
   useFactory: async (
     configService: ConfigService,
   ): Promise<TypeOrmModuleOptions> => ({
-    type: 'mysql',
+    type: 'postgres',
     host: configService.get('DB_HOST'),
     port: configService.get('DB_PORT'),
     username: configService.get('DB_USERNAME'),
@@ -25,12 +25,12 @@ export const typeOrmConfigAsync: TypeOrmModuleAsyncOptions = {
 };
 
 export const dataSourceOptions: DataSourceOptions = {
-  type: 'mysql',
+  type: 'postgres',
   host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '3306'),
-  username: process.env.DB_USERNAME || 'root',
-  password: process.env.DB_PASSWORD || '12345',
-  database: process.env.DB_DATABASE || 'blog',
+  port: parseInt(process.env.DB_PORT || '5432'),
+  username: process.env.DB_USERNAME || 'postgres',
+  password: process.env.DB_PASSWORD || 'root',
+  database: process.env.DB_DATABASE || 'portfilio',
   entities: [User, ProfilePicture],
   migrations: ['src/migrations/*{.ts,.js}'],
   synchronize: false,

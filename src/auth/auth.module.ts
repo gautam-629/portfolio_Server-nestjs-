@@ -20,10 +20,10 @@ import googleOauthConfig from './config/google-oauth.config';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
-    ConfigModule.forFeature(googleOauthConfig),
-    JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
+    ConfigModule.forFeature(googleOauthConfig),
     ConfigModule.forFeature(refreshConfig),
+    JwtModule.registerAsync(jwtConfig.asProvider()),
   ],
   controllers: [AuthController],
   providers: [
