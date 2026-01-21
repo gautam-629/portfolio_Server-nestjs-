@@ -6,11 +6,11 @@ import {
 } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { CreateuserDto } from './dto/create-user.dto';
+import { CreateuserDto } from './dto/user/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from './entity/user.entity';
 import { plainToInstance } from 'class-transformer';
-import { UserResponseDto } from './dto/user-response.dto';
+import { UserResponseDto } from './dto/user/user-response.dto';
 
 @Injectable()
 export class UserService {

@@ -1,16 +1,19 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Message } from 'src/common/decorator/message.decorator';
-import { CreateuserDto } from './dto/create-user.dto';
+import { CreateuserDto } from './dto/user/create-user.dto';
 import { Public } from 'src/common/decorator/public.decorator';
 import { RoleEnum } from 'src/common/enums/roles.enum';
 import { Roles } from 'src/common/decorator/roles.decorator';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Message('Successfully created User')
+  @ApiBearerAuth('access-token')
+   @ApiOperation({ summary: 'Create Users' })
   @Roles(RoleEnum.ADMIN, RoleEnum.MODERATOR)
   @Post()
   async CreateuserDto(@Body() createUserDto: CreateuserDto) {

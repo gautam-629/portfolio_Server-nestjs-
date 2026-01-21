@@ -26,7 +26,15 @@ async function bootstrap() {
     .setTitle('Blog Application')
     .setDescription('This is Api Description')
     .setVersion('1.0')
-    .addTag('blog')
+    .addBearerAuth(
+    {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+    },
+    'access-token',
+  )
+    .addTag('portfilio')
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, connfig);
