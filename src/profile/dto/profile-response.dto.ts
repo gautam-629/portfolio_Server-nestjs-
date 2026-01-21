@@ -16,5 +16,5 @@ export class ProfileDto {
   firstName: string;
 
   @Expose()
-  lastName: String;
+  lastName: string;
 }

@@ -5,7 +5,11 @@ import { CreateuserDto } from './dto/user/create-user.dto';
 import { Public } from 'src/common/decorator/public.decorator';
 import { RoleEnum } from 'src/common/enums/roles.enum';
 import { Roles } from 'src/common/decorator/roles.decorator';
-import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam } from '@nestjs/swagger';
+import {
+  PaginationQueryDto,
+  UserIdParamDto,
+} from './dto/user/general-user.dto';
 
 @Controller('users')
 export class UserController {
@@ -13,7 +17,7 @@ export class UserController {
 
   @Message('Successfully created User')
   @ApiBearerAuth('access-token')
-   @ApiOperation({ summary: 'Create Users' })
+  @ApiOperation({ summary: 'Create Users' })
   @Roles(RoleEnum.ADMIN, RoleEnum.MODERATOR)
   @Post()
   async CreateuserDto(@Body() createUserDto: CreateuserDto) {
@@ -22,14 +26,15 @@ export class UserController {
 
   @Public()
   @Get(':id')
-  async getSingleUser(@Param() param: { id: string }) {
-    console.log(param.id);
-    return await this.userService.findById(param.id);
+  async getSingleUser(@Param() param: UserIdParamDto) {
+    return this.userService.findById(param.id);
   }
 
-  @Get()
   @Public()
-  async getAll(@Query('page') page: number, @Query('limit') limit: number) {
-    return this.userService.getAll(Number(page) || 1, Number(limit) || 10);
+  @Get()
+  async getAll(@Query() query: PaginationQueryDto) {
+    const page = query.page || 1;
+    const limit = query.limit || 10;
+    return this.userService.getAll(page, limit);
   }
 }

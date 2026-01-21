@@ -53,7 +53,7 @@ export class ProfileService {
         [createDto.userId],
       );
 
-      let result = insertedRecord[0];
+      const result = insertedRecord[0];
       result.imageUrl = `${domain}/${result.imageUrl}`;
 
       await queryRunner.commitTransaction();

@@ -76,23 +76,26 @@ export class UserService {
   }
 
   async getAll(page: number, limit: number) {
-    const quaryRunner = await this.dataSource.createQueryRunner();
-    await quaryRunner.connect();
+    const queryRunner = await this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+
     try {
-      quaryRunner.startTransaction();
+      await queryRunner.startTransaction();
 
       const offset = (page - 1) * limit;
 
-      const users = await quaryRunner.query(
-        `SELECT * FROM users LIMIT ? OFFSET ?`,
+      // PostgreSQL uses $1, $2 for parameterized queries
+      const users = await queryRunner.query(
+        `SELECT * FROM users LIMIT $1 OFFSET $2`,
         [limit, offset],
       );
 
-      const totalResult = await quaryRunner.query(`SELECT COUNT(*) from users`);
+      const totalResult = await queryRunner.query(
+        `SELECT COUNT(*) AS count FROM users`,
+      );
+      const total = Number(totalResult[0].count || 0);
 
-      const total = Number(totalResult[0]['COUNT(*)'] || 0);
-
-      await quaryRunner.commitTransaction();
+      await queryRunner.commitTransaction();
 
       return {
         result: plainToInstance(UserResponseDto, users, {
@@ -104,11 +107,13 @@ export class UserService {
         totalPage: Math.ceil(total / limit),
       };
     } catch (error) {
-      await quaryRunner.rollbackTransaction();
+      await queryRunner.rollbackTransaction();
       throw new HttpException(
-        `Failed to fetch user${error.message}`,
+        `Failed to fetch users: ${error.message}`,
         HttpStatus.BAD_REQUEST,
       );
+    } finally {
+      await queryRunner.release();
     }
   }
 }
