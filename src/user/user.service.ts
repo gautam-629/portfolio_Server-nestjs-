@@ -101,10 +101,13 @@ export class UserService {
         result: plainToInstance(UserResponseDto, users, {
           excludeExtraneousValues: true,
         }),
+        pagination:{
         page,
         total,
         limit,
         totalPage: Math.ceil(total / limit),
+        }
+       
       };
     } catch (error) {
       await queryRunner.rollbackTransaction();
