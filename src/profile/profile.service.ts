@@ -1,16 +1,17 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateProfilePictureDto } from './dto/create-profile.dto';
-import { ProfilePicture } from './entity/profile.entity';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { plainToInstance } from 'class-transformer';
-import { ProfileDto } from './dto/profile-response.dto';
-import { domain } from 'src/common/const';
-import { use } from 'passport';
-import * as path from 'path';
 import * as fs from 'fs';
-import { resourceUsage } from 'process';
+import * as path from 'path';
+
+import { CreateProfilePictureDto } from './dto/create-profile.dto';
 import { UpdateProfilePictureDto } from './dto/update-profile.dto';
+import { ProfilePicture } from './entity/profile.entity';
+import { domain } from 'src/common/const';
 
 @Injectable()
 export class ProfileService {
@@ -19,46 +20,58 @@ export class ProfileService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async create(createDto: CreateProfilePictureDto): Promise<ProfilePicture> {
+  async create(
+    createDto: CreateProfilePictureDto,
+  ): Promise<ProfilePicture> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
 
     try {
       await queryRunner.startTransaction();
 
-      // ✅ Check if user exists
-      const userExists = await queryRunner.query(
-        'SELECT id FROM users WHERE id = ?',
+      // ✅ Check user exists
+      const user = await queryRunner.query(
+        `SELECT id FROM users WHERE id = $1`,
         [createDto.userId],
       );
 
-      if (!userExists.length) {
+      if (!user.length) {
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
 
       // ✅ Insert profile picture
       await queryRunner.query(
-        `INSERT INTO profile_pictures (imageUrl, uploadedAt, userId) VALUES (?, NOW(), ?)`,
+        `
+        INSERT INTO profile_pictures ("imageUrl", "uploadedAt", "userId")
+        VALUES ($1, NOW(), $2)
+        `,
         [createDto.imageUrl, createDto.userId],
       );
 
-      // ✅ Get the most recently inserted record (optional: ORDER BY + LIMIT)
-      const insertedRecord = await queryRunner.query(
-        `SELECT pp.id, pp.imageUrl, u.id as userId, u.firstName, u.lastName, u.email
-       FROM profile_pictures pp 
-       LEFT JOIN users u ON pp.userId = u.id
-       WHERE pp.userId = ?
-       ORDER BY pp.uploadedAt DESC
-       LIMIT 1`,
+      // ✅ Fetch latest uploaded picture
+      const [profile] = await queryRunner.query(
+        `
+        SELECT
+          pp.id,
+          pp."imageUrl",
+          pp."uploadedAt",
+          u.id   AS "userId",
+          u.email,
+          u."firstName",
+          u."lastName"
+        FROM profile_pictures pp
+        LEFT JOIN users u ON u.id = pp."userId"
+        WHERE pp."userId" = $1
+        ORDER BY pp."uploadedAt" DESC
+        LIMIT 1
+        `,
         [createDto.userId],
       );
 
-      const result = insertedRecord[0];
-      result.imageUrl = `${domain}/${result.imageUrl}`;
+      profile.imageUrl = `${domain}${profile.imageUrl}`;
 
       await queryRunner.commitTransaction();
-
-      return result;
+      return profile;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw new HttpException(
@@ -70,29 +83,32 @@ export class ProfileService {
     }
   }
 
+  
   async findAll() {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
 
     try {
-      await queryRunner.startTransaction();
+      const profiles = await queryRunner.query(`
+        SELECT
+          pp.id,
+          pp."imageUrl",
+          pp."uploadedAt",
+          u.email,
+          u."firstName",
+          u."lastName"
+        FROM profile_pictures pp
+        LEFT JOIN users u ON u.id = pp."userId"
+        ORDER BY pp."uploadedAt" DESC
+      `);
 
-      const profile = await queryRunner.query(`
-      SELECT pp.id, pp.imageUrl, u.email, u.firstName, u.lastName 
-      FROM profile_pictures pp 
-      LEFT JOIN users u ON pp.userId = u.id;
-    `);
-
-      await queryRunner.commitTransaction();
-
-      return plainToInstance(ProfileDto, profile, {
-        excludeExtraneousValues: true,
-      });
+      return profiles.map((p) => ({
+        ...p,
+        imageUrl: `${domain}${p.imageUrl}`,
+      }));
     } catch (error) {
-      console.log(error);
-      await queryRunner.rollbackTransaction();
       throw new HttpException(
-        `Failed to fetch profile, ${error.message}`,
+        `Failed to fetch profiles: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     } finally {
@@ -101,115 +117,110 @@ export class ProfileService {
   }
 
   async deleteProfilePicture(userId: string, profileId: string) {
-    const queryRunner = await this.dataSource.createQueryRunner();
+    const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
 
     try {
       await queryRunner.startTransaction();
 
-      //find profile picture details
-      const profilePicture = await queryRunner.query(
-        `
-      SELECT id,imageUrl from profile_pictures WHERE id=?
-      `,
+      // ✅ Find profile
+      const [profile] = await queryRunner.query(
+        `SELECT id, "imageUrl" FROM profile_pictures WHERE id = $1`,
         [profileId],
       );
 
-      if (!profilePicture.length) {
-        throw new HttpException('Profile Not Found', HttpStatus.NOT_FOUND);
-      }
-
-      const deleteRecord = await queryRunner.query(
-        `DELETE FROM profile_pictures WHERE id=?`,
-        [profileId],
-      );
-
-      if (deleteRecord[0] === 0) {
+      if (!profile) {
         throw new HttpException(
-          'Profile Picture not Found',
+          'Profile picture not found',
           HttpStatus.NOT_FOUND,
         );
       }
 
-      console.log(profilePicture[0]);
+      // ✅ Delete DB record
+      const result = await queryRunner.query(
+        `DELETE FROM profile_pictures WHERE id = $1 RETURNING id`,
+        [profileId],
+      );
 
-      //delete the profile from filesystem
-      if (profilePicture[0].imageUrl) {
-        const filePath = path.join(
-          `${process.cwd()}${profilePicture[0].imageUrl}`,
+      if (!result.length) {
+        throw new HttpException(
+          'Failed to delete profile picture',
+          HttpStatus.BAD_REQUEST,
         );
+      }
 
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
+      // ✅ Delete file from disk
+      const filePath = path.join(process.cwd(), profile.imageUrl);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
       }
 
       await queryRunner.commitTransaction();
-
-      return { userId: userId, profileId: profileId };
+      return { userId, profileId };
     } catch (error) {
-      console.log(error);
       await queryRunner.rollbackTransaction();
       throw new HttpException(
-        `Failed to Delete Profile Picture ${error.message}`,
+        `Failed to delete profile picture: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     } finally {
       await queryRunner.release();
     }
   }
-  async UpdateProfilePicture(
+
+ 
+  async updateProfilePicture(
     userId: string,
     profileId: string,
-    updateProfileDto: UpdateProfilePictureDto,
+    updateDto: UpdateProfilePictureDto,
   ) {
-    const queryRunner = await this.dataSource.createQueryRunner();
+    const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
+
     try {
       await queryRunner.startTransaction();
 
-      //find profile
-      const profilePicture = await queryRunner.query(
-        `SELECT  id,imageUrl FROM profile_pictures WHERE id=? `,
+      // ✅ Find existing profile
+      const [profile] = await queryRunner.query(
+        `SELECT id, "imageUrl" FROM profile_pictures WHERE id = $1`,
         [profileId],
       );
 
-      if (!profilePicture.length) {
+      if (!profile) {
         throw new HttpException(
-          'ProfilePicture not found',
+          'Profile picture not found',
           HttpStatus.NOT_FOUND,
         );
       }
 
-      //delelte old file
-      if (profilePicture[0].imageUrl) {
-        const filePath = path.join(
-          `${process.cwd()}${profilePicture[0].imageUrl}`,
-        );
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
+      // ✅ Delete old file
+      const oldPath = path.join(process.cwd(), profile.imageUrl);
+      if (fs.existsSync(oldPath)) {
+        fs.unlinkSync(oldPath);
       }
 
-      //update if found
-      const updateProfilepicture = await queryRunner.query(
-        `Update profile_pictures SET imageUrl=? WHERE id=? `,
-        [updateProfileDto.imageUrl, profileId],
+      // ✅ Update record
+      const updated = await queryRunner.query(
+        `
+        UPDATE profile_pictures
+        SET "imageUrl" = $1
+        WHERE id = $2
+        RETURNING id
+        `,
+        [updateDto.imageUrl, profileId],
       );
 
-      if (updateProfilepicture.affedtedRows === 0) {
+      if (!updated.length) {
         throw new HttpException(
-          `Failed to update profile picture`,
+          'Failed to update profile picture',
           HttpStatus.BAD_REQUEST,
         );
       }
 
       await queryRunner.commitTransaction();
-
-      return { profileId: profileId, userId: userId };
+      return { userId, profileId };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-
       throw new HttpException(
         `Failed to update profile picture: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
