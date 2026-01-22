@@ -10,6 +10,8 @@ import { ProfileModule } from './profile/profile.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
+import { TechStackModule } from './tech-stack/tech-stack.module';
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { RequestLoggerMiddleware } from './common/middleware/request-logger.midd
     AuthModule,
     UserModule,
     ProfileModule,
+    TechStackModule,
+    ProjectsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
