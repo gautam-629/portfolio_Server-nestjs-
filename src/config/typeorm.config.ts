@@ -33,7 +33,7 @@ export const dataSourceOptions: DataSourceOptions = {
   username: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || 'root',
   database: process.env.DB_DATABASE || 'portfilio',
-  entities: [User, ProfilePicture,TechStack,Project],
+  entities: [User, ProfilePicture, TechStack, Project],
   migrations: ['src/migrations/*{.ts,.js}'],
   synchronize: false,
 };

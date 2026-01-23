@@ -16,9 +16,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Message('Successfully created User')
-  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Create Users' })
-  @Roles(RoleEnum.ADMIN, RoleEnum.MODERATOR)
+  @Public()
   @Post()
   async CreateuserDto(@Body() createUserDto: CreateuserDto) {
     return await this.userService.create(createUserDto);

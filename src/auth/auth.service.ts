@@ -1,9 +1,4 @@
-import {
-  ConflictException,
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateuserDto } from 'src/user/dto/user/create-user.dto';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
@@ -86,9 +81,7 @@ export class AuthService {
       throw new UnauthorizedException('User not found!');
     }
 
-    const currentUser = { id: user.id, role: user.role };
-
-    return currentUser;
+    return user;
   }
 
   async validateRefreshToken(userId: string, refreshToken: string) {

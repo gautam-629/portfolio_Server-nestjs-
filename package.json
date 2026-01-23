@@ -43,6 +43,7 @@
     "i": "^0.3.7",
     "multer": "^2.0.1",
     "mysql2": "^3.14.1",
+    "nestjs-cls": "^6.2.0",
     "npm": "^11.4.2",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",

@@ -16,6 +16,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { GoogleStrategy } from './strategies/google.strategy';
 import googleOauthConfig from './config/google-oauth.config';
+import { CLSServiceImp } from 'src/common/local-storage/cls/cls.service';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import googleOauthConfig from './config/google-oauth.config';
     JwtStragegy,
     RefreshStrategy,
     GoogleStrategy,
+    CLSServiceImp,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

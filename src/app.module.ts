@@ -12,6 +12,7 @@ import { join } from 'path';
 import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
 import { TechStackModule } from './tech-stack/tech-stack.module';
 import { ProjectsModule } from './projects/projects.module';
+import { LocalStorageModule } from './common/local-storage/local-storage.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ProjectsModule } from './projects/projects.module';
     ProfileModule,
     TechStackModule,
     ProjectsModule,
+    LocalStorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -12,7 +12,10 @@ import {
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { ProfilePictureUpload } from 'src/common/decorator/file-upload.decorator';
-import { CreateProfilePictureDto, ProfilePictureUploadSchema } from './dto/create-profile.dto';
+import {
+  CreateProfilePictureDto,
+  ProfilePictureUploadSchema,
+} from './dto/create-profile.dto';
 import { Public } from 'src/common/decorator/public.decorator';
 import { Message } from 'src/common/decorator/message.decorator';
 import { UpdateProfilePictureDto } from './dto/update-profile.dto';
@@ -24,7 +27,7 @@ export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @ApiTags('Profile')
-  @ApiBearerAuth('access-token') 
+  @ApiBearerAuth('access-token')
   @Message('Successfully created Profile')
   @Post('upload')
   @ProfilePictureUpload()
@@ -53,7 +56,10 @@ export class ProfileController {
   @Message('Successfully deleted Profile Picture')
   @ApiBearerAuth('access-token')
   @Delete(':id')
-  async deleteProfilePicture(@Request() req, @Param() params: profileIdParamDto) {
+  async deleteProfilePicture(
+    @Request() req,
+    @Param() params: profileIdParamDto,
+  ) {
     return await this.profileService.deleteProfilePicture(
       req.user.id,
       params.id,

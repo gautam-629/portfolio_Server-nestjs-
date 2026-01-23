@@ -1,8 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import * as fs from 'fs';
@@ -20,9 +16,7 @@ export class ProfileService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async create(
-    createDto: CreateProfilePictureDto,
-  ): Promise<ProfilePicture> {
+  async create(createDto: CreateProfilePictureDto): Promise<ProfilePicture> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
 
@@ -83,7 +77,6 @@ export class ProfileService {
     }
   }
 
-  
   async findAll() {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -168,7 +161,6 @@ export class ProfileService {
     }
   }
 
- 
   async updateProfilePicture(
     userId: string,
     profileId: string,
