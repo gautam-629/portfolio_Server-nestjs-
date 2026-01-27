@@ -47,19 +47,156 @@ export class TechStackService {
     }
   }
 
-  findAll() {
-    return `This action returns all techStack`;
+  async findAll() {
+    const queryRunner = this.datasource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const techs = await queryRunner.query(
+        `SELECT * from techs WHERE "deletedAt" IS NULL ORDER BY "createdAt" DESC`,
+      );
+      await queryRunner.commitTransaction();
+      return techs;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new HttpException(
+        `Failed to fetch techs: ${error.message}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    } finally {
+      await queryRunner.release();
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} techStack`;
+  async getOneForFalse(id: string) {
+    const queryRunner = this.datasource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const result = await queryRunner.query(
+        `SELECT * FROM tech WHERE id=$1 AND "deletedAt" IS NULL`,
+        [id],
+      );
+      if (!result.length) {
+        return false;
+      } else {
+        return result[0];
+      }
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error instanceof HttpException
+        ? error
+        : new HttpException(
+            `Failed to fetch tech: ${error.message}`,
+            HttpStatus.BAD_REQUEST,
+          );
+    } finally {
+      await queryRunner.release();
+    }
   }
 
-  update(id: number, updateTechStackDto: UpdateTechStackDto) {
-    return `This action updates a #${id} techStack`;
+  async findOne(id: string) {
+    const queryRunner = this.datasource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const result = await queryRunner.query(
+        `SELECT * FROM techs WHERE id=$1 AND  "deletedAt" IS NUll `,
+        [id],
+      );
+      if (!result.length) {
+        throw new HttpException('Tech not found', HttpStatus.NOT_FOUND);
+      }
+      await queryRunner.commitTransaction();
+      return result[0];
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error instanceof HttpException
+        ? error
+        : new HttpException(
+            `Failed to fetch tech: ${error.message}`,
+            HttpStatus.BAD_REQUEST,
+          );
+    } finally {
+      await queryRunner.release();
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} techStack`;
+  async update(id: string, updateTechStackDto: Partial<UpdateTechStackDto>) {
+    const tech = await this.getOneForFalse(id);
+    if (!tech) {
+      throw new HttpException('Tech not found', HttpStatus.NOT_FOUND);
+    }
+    const queryRunner = this.datasource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const result = await queryRunner.query(
+        `
+            UPDATE techs 
+            set 
+            "title"=COALESCE($1,"title"),
+             "description"=COALESE($2,"description"),
+             "updatedAt"=NOW()
+             WHERE id=$3 And "deletedAt" IS NULL
+             RETURING *
+            `,
+        [updateTechStackDto.title, updateTechStackDto.description, id],
+      );
+      if (!result.length) {
+        throw new HttpException('Tech not found', HttpStatus.NOT_FOUND);
+      }
+      await queryRunner.commitTransaction();
+      return result[0];
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      if (error.code === '23505') {
+        throw new HttpException(
+          'Tech title already exists',
+          HttpStatus.CONFLICT,
+        );
+      }
+
+      throw error instanceof HttpException
+        ? error
+        : new HttpException(
+            `Failed to update tech: ${error.message}`,
+            HttpStatus.BAD_REQUEST,
+          );
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async remove(id: string) {
+    const queryRunner = this.datasource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const tech = await this.getOneForFalse(id);
+      if (!tech) {
+        throw new HttpException('Tech not found', HttpStatus.NOT_FOUND);
+      }
+
+      const result = await queryRunner.query(
+        `UPDATE techs SET "deletedAt"=NOW() WHERE id=$1 AND "deletedAt" IS NULL RETURNING id`,
+        [id],
+      );
+      if (!result.length) {
+        throw new HttpException('Tech not found', HttpStatus.NOT_FOUND);
+      }
+      await queryRunner.commitTransaction();
+      return result[0];
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error instanceof HttpException
+        ? error
+        : new HttpException(
+            `Failed to delete tech: ${error.message}`,
+            HttpStatus.BAD_REQUEST,
+          );
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

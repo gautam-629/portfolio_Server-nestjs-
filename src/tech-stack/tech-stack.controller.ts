@@ -14,6 +14,8 @@ import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { RoleEnum } from 'src/common/enums/roles.enum';
 import { Message } from 'src/common/decorator/message.decorator';
+import { Public } from 'src/common/decorator/public.decorator';
+import { TechIdPramDto } from './dto/general-tech-stack.dto';
 
 @Controller('tech-stack')
 export class TechStackController {
@@ -28,26 +30,38 @@ export class TechStackController {
     return this.techStackService.create(createTechStackDto);
   }
 
+  @Public()
+  @ApiOperation({ summary: 'Tech List' })
+  @Message('Tech List')
   @Get()
   findAll() {
     return this.techStackService.findAll();
   }
 
+  @Message('Tech Details')
+  @ApiOperation({ summary: 'Tech details' })
+  @Public()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.techStackService.findOne(+id);
+  findOne(@Param() parms: TechIdPramDto) {
+    return this.techStackService.findOne(parms?.id);
   }
 
+  @Message('Successfully updated TechStack')
+  @ApiOperation({ summary: 'Update Tech Stack' })
+  @ApiBearerAuth('access-token')
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param() params: TechIdPramDto,
     @Body() updateTechStackDto: UpdateTechStackDto,
   ) {
-    return this.techStackService.update(+id, updateTechStackDto);
+    return this.techStackService.update(params.id, updateTechStackDto);
   }
 
+  @Message('Successfully deleted TechStack')
+  @ApiOperation({ summary: 'Delete Tech Stack' })
+  @ApiBearerAuth('access-token')
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.techStackService.remove(+id);
+  remove(@Param() params: TechIdPramDto) {
+    return this.techStackService.remove(params.id);
   }
 }

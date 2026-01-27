@@ -3,6 +3,7 @@ import { User } from '../../user/entity/user.entity';
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToMany,
@@ -36,6 +37,9 @@ export class TechStack {
     name: 'createdBy',
   })
   createdBy: User;
+
+  @DeleteDateColumn({ nullable: true })
+  deletedAt: Date;
 
   @ManyToMany(() => Project, (project) => project.techs)
   project: Project[];
