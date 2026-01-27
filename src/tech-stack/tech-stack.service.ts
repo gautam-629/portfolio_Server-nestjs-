@@ -74,7 +74,7 @@ export class TechStackService {
     await queryRunner.startTransaction();
     try {
       const result = await queryRunner.query(
-        `SELECT * FROM tech WHERE id=$1 AND "deletedAt" IS NULL`,
+        `SELECT * FROM techs WHERE id=$1 AND "deletedAt" IS NULL`,
         [id],
       );
       if (!result.length) {
@@ -134,12 +134,13 @@ export class TechStackService {
       const result = await queryRunner.query(
         `
             UPDATE techs 
-            set 
-            "title"=COALESCE($1,"title"),
-             "description"=COALESE($2,"description"),
-             "updatedAt"=NOW()
-             WHERE id=$3 And "deletedAt" IS NULL
-             RETURING *
+             SET
+          "title" = COALESCE($1, "title"),
+           "description" = COALESCE($2, "description"),
+           "updatedAt" = NOW()
+      WHERE id = $3
+       AND "deletedAt" IS NULL
+       RETURNING *
             `,
         [updateTechStackDto.title, updateTechStackDto.description, id],
       );

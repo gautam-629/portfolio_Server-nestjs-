@@ -9,6 +9,7 @@ import {
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('techs')
@@ -40,6 +41,9 @@ export class TechStack {
 
   @DeleteDateColumn({ nullable: true })
   deletedAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt:Date;
 
   @ManyToMany(() => Project, (project) => project.techs)
   project: Project[];
