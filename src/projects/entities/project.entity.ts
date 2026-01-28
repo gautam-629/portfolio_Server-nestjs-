@@ -15,7 +15,7 @@ export class Project {
   @Column({
     type: 'varchar',
     length: 255,
-    unique:true
+    unique: true,
   })
   title: string;
 

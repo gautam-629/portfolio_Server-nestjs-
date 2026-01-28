@@ -97,10 +97,12 @@ export class UserService {
 
       await queryRunner.commitTransaction();
 
+      const result = plainToInstance(UserResponseDto, users, {
+        excludeExtraneousValues: true,
+      });
+
       return {
-        result: plainToInstance(UserResponseDto, users, {
-          excludeExtraneousValues: true,
-        }),
+        data: result,
         pagination: {
           page,
           total,

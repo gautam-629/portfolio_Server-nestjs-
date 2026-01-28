@@ -6,10 +6,8 @@ import { Public } from 'src/common/decorator/public.decorator';
 import { RoleEnum } from 'src/common/enums/roles.enum';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { ApiBearerAuth, ApiOperation, ApiParam } from '@nestjs/swagger';
-import {
-  PaginationQueryDto,
-  UserIdParamDto,
-} from './dto/user/general-user.dto';
+import { UserIdParamDto } from './dto/user/general-user.dto';
+import { PaginationQueryDto } from 'src/common/dto/general-dtos';
 
 @Controller('users')
 export class UserController {

@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UploadedFiles,
+  Query,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -16,6 +17,8 @@ import { Message } from 'src/common/decorator/message.decorator';
 import { MultipleFileUpload } from 'src/common/decorator/file-upload.decorator';
 import { ProjectUploadSchema } from './dto/general-dtos';
 import { ProjectResponseDto } from './dto/project-response.dto';
+import { Public } from 'src/common/decorator/public.decorator';
+import { PaginationQueryDto } from 'src/common/dto/general-dtos';
 
 @Controller('projects')
 export class ProjectsController {
@@ -40,8 +43,9 @@ export class ProjectsController {
   }
 
   @Get()
-  findAll() {
-    return this.projectsService.findAll();
+  @Public()
+  findAll(@Query() query: PaginationQueryDto) {
+    return this.projectsService.findAll(query);
   }
 
   @Get(':id')
