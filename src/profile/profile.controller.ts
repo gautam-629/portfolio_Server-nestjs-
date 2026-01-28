@@ -14,13 +14,13 @@ import { ProfileService } from './profile.service';
 import { ProfilePictureUpload } from 'src/common/decorator/file-upload.decorator';
 import {
   CreateProfilePictureDto,
-  ProfilePictureUploadSchema,
 } from './dto/create-profile.dto';
 import { Public } from 'src/common/decorator/public.decorator';
 import { Message } from 'src/common/decorator/message.decorator';
 import { UpdateProfilePictureDto } from './dto/update-profile.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { profileIdParamDto } from './dto/general-profile.dto';
+import { PictureUploadSchema } from 'src/common/dto/general-dtos';
 
 @Controller('profile')
 export class ProfileController {
@@ -32,7 +32,7 @@ export class ProfileController {
   @Post('upload')
   @ProfilePictureUpload()
   @ApiConsumes('multipart/form-data')
-  @ApiBody(ProfilePictureUploadSchema)
+  @ApiBody(PictureUploadSchema)
   async uploadProfilePicture(
     @Request() req,
     @UploadedFile() file: Express.Multer.File,
@@ -71,7 +71,7 @@ export class ProfileController {
   @Patch(':id')
   @ProfilePictureUpload()
   @ApiConsumes('multipart/form-data')
-  @ApiBody(ProfilePictureUploadSchema)
+  @ApiBody(PictureUploadSchema)
   async UpdateProfilePicture(
     @Request() req,
     @Param() params: profileIdParamDto,

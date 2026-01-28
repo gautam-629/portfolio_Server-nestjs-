@@ -5,7 +5,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileUploadOptions } from '../types/fileUpload';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 
@@ -85,9 +85,9 @@ export const AvatarUpload = () => {
 };
 
 // Generic image upload decorator
-export const ImageUpload = (destination: string = './uploads/images') => {
+export const ImageUpload = () => {
   return FileUpload({
-    destination,
+    destination:'./uploads/projects',
     allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
     maxFileSize: 8 * 1024 * 1024, // 8MB
     fieldName: 'image',
@@ -99,16 +99,16 @@ export const MultipleFileUpload = (
   options: FileUploadOptions & { maxCount?: number } = {},
 ) => {
   const {
-    destination = './uploads',
+    destination = './uploads/projects',
     allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'],
     maxFileSize = 5 * 1024 * 1024,
-    fieldName = 'files',
+    fieldName = 'images',
     maxCount = 5,
   } = options;
 
   return applyDecorators(
     UseInterceptors(
-      FileInterceptor(fieldName, {
+      FilesInterceptor(fieldName, maxCount, { 
         storage: diskStorage({
           destination,
           filename: (req, file, cb) => {
@@ -137,7 +137,6 @@ export const MultipleFileUpload = (
         },
         limits: {
           fileSize: maxFileSize,
-          files: maxCount,
         },
       }),
     ),

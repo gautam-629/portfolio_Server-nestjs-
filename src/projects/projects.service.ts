@@ -4,7 +4,9 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 
 @Injectable()
 export class ProjectsService {
+
   create(createProjectDto: CreateProjectDto) {
+    console.log(createProjectDto,'createProjectDto')
     return 'This action adds a new project';
   }
 
