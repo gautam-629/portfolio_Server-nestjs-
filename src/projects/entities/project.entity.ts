@@ -5,8 +5,10 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ProjectPhotos } from './Project-photo.entity';
 
 @Entity('projects')
 export class Project {
@@ -23,12 +25,6 @@ export class Project {
     type: 'text',
   })
   description: string;
-
-  @Column({
-    type: 'varchar',
-    nullable: true,
-  })
-  image: string;
 
   @Column({
     type: 'varchar',
@@ -62,4 +58,7 @@ export class Project {
     name: 'project_tech',
   })
   techs: TechStack;
+
+  @OneToMany(()=>ProjectPhotos,(photo)=>photo.project)
+  photos:ProjectPhotos[]
 }

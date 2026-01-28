@@ -8,6 +8,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { ProfilePicture } from '../profile/entity/profile.entity';
 import { TechStack } from '../tech-stack/entities/tech-stack.entity';
 import { Project } from '../projects/entities/project.entity';
+import { ProjectPhotos } from '../projects/entities/Project-photo.entity';
 export const typeOrmConfigAsync: TypeOrmModuleAsyncOptions = {
   imports: [ConfigModule],
   useFactory: async (
@@ -33,7 +34,7 @@ export const dataSourceOptions: DataSourceOptions = {
   username: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || 'root',
   database: process.env.DB_DATABASE || 'portfilio',
-  entities: [User, ProfilePicture, TechStack, Project],
+  entities: [User, ProfilePicture, TechStack, Project,ProjectPhotos],
   migrations: ['src/migrations/*{.ts,.js}'],
   synchronize: false,
 };
