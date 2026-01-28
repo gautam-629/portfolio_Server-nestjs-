@@ -1,18 +1,24 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Project } from "./project.entity";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Project } from './project.entity';
 
 @Entity('project_pictures')
-export class ProjectPhotos{
-    @PrimaryGeneratedColumn('uuid')
-    id:string
+export class ProjectPhotos {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column({
-        type:'varchar',
-        length:255
-    })
-    imageUrl:string
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
+  imageUrl: string;
 
-    @ManyToOne(()=>Project,(project)=>project.photos)
-    project:Project
-
+  @ManyToOne(() => Project)
+  @JoinColumn({ name: 'ProjectId' })
+  project: Project;
 }

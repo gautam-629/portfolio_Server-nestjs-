@@ -8,4 +8,3 @@ export class CreateProfilePictureDto {
   @IsString()
   imageUrl: string;
 }
-

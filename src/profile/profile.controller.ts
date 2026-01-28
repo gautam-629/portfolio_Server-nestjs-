@@ -12,9 +12,7 @@ import {
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { ProfilePictureUpload } from 'src/common/decorator/file-upload.decorator';
-import {
-  CreateProfilePictureDto,
-} from './dto/create-profile.dto';
+import { CreateProfilePictureDto } from './dto/create-profile.dto';
 import { Public } from 'src/common/decorator/public.decorator';
 import { Message } from 'src/common/decorator/message.decorator';
 import { UpdateProfilePictureDto } from './dto/update-profile.dto';

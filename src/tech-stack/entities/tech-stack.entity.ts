@@ -1,4 +1,3 @@
-import { Project } from '../../projects/entities/project.entity';
 import { User } from '../../user/entity/user.entity';
 import {
   Column,
@@ -6,8 +5,8 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
-  ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -43,8 +42,5 @@ export class TechStack {
   deletedAt: Date;
 
   @UpdateDateColumn()
-  updatedAt:Date;
-
-  @ManyToMany(() => Project, (project) => project.techs)
-  project: Project[];
+  updatedAt: Date;
 }

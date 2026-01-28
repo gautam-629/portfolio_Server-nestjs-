@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 
 export class CreateProjectDto {
   @ApiProperty({ example: 'Ecommerce' })
@@ -8,7 +14,10 @@ export class CreateProjectDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ example: 'This project is an ecommerce platform', required: false })
+  @ApiProperty({
+    example: 'This project is an ecommerce platform',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   description?: string;
@@ -19,7 +28,10 @@ export class CreateProjectDto {
   @IsOptional()
   liveUrl?: string;
 
-  @ApiProperty({ example: 'https://github.com/username/project', required: false })
+  @ApiProperty({
+    example: 'https://github.com/username/project',
+    required: false,
+  })
   @IsString()
   @IsUrl()
   @IsOptional()
@@ -35,7 +47,7 @@ export class CreateProjectDto {
     description: 'Project images',
   })
   @IsOptional()
-  images?: any; 
+  images?: any;
 
   @ApiProperty({ example: 'Build a scalable ecommerce solution' })
   @IsString()
@@ -48,23 +60,23 @@ export class CreateProjectDto {
   projectOutCome: string;
 
   @ApiProperty({
-    example:[
+    example: [
       'cwuebvweevbwoewec4545eiruee cv3i',
-      '3f34iv3n4of3urnc3v94hvvnri4954g9v'
+      '3f34iv3n4of3urnc3v94hvvnri4954g9v',
     ],
   })
-  @Transform(({value})=>{
-    if(Array.isArray(value)) return value;
-    if(typeof value==='string'){
-       try {
-       return JSON.parse(value)
-       } catch (error) {
-        return value.split(',').map(v=>v.trim())
-       }
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch (error) {
+        return value.split(',').map((v) => v.trim());
+      }
     }
-    return value
+    return value;
   })
   @IsArray()
   @IsNotEmpty()
-  techIds:string[]
+  techIds: string[];
 }

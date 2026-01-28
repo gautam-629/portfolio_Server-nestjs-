@@ -1,14 +1,11 @@
-import { TechStack } from '../../tech-stack/entities/tech-stack.entity';
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
-  OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { ProjectPhotos } from './Project-photo.entity';
 
 @Entity('projects')
 export class Project {
@@ -18,6 +15,7 @@ export class Project {
   @Column({
     type: 'varchar',
     length: 255,
+    unique:true
   })
   title: string;
 
@@ -53,12 +51,9 @@ export class Project {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToMany(() => TechStack, (tech) => tech.project)
-  @JoinTable({
-    name: 'project_tech',
-  })
-  techs: TechStack;
+  @UpdateDateColumn()
+  updatedAt: Date;
 
-  @OneToMany(()=>ProjectPhotos,(photo)=>photo.project)
-  photos:ProjectPhotos[]
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

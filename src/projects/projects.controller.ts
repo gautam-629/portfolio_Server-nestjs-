@@ -13,8 +13,9 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Message } from 'src/common/decorator/message.decorator';
-import {  MultipleFileUpload } from 'src/common/decorator/file-upload.decorator';
+import { MultipleFileUpload } from 'src/common/decorator/file-upload.decorator';
 import { ProjectUploadSchema } from './dto/general-dtos';
+import { ProjectResponseDto } from './dto/project-response.dto';
 
 @Controller('projects')
 export class ProjectsController {
@@ -29,11 +30,13 @@ export class ProjectsController {
   @Post()
   create(
     @Body() createProjectDto: CreateProjectDto,
-    @UploadedFiles() file:Express.Multer.File[]
-  ) {
-    
-    const imageUrl=file.map((file)=>`/uploads/projects/${file.filename}`)
-    return this.projectsService.create({...createProjectDto,images:imageUrl});
+    @UploadedFiles() file: Express.Multer.File[],
+  ): Promise<ProjectResponseDto> {
+    const imageUrl = file.map((file) => `/uploads/projects/${file.filename}`);
+    return this.projectsService.create({
+      ...createProjectDto,
+      images: imageUrl,
+    });
   }
 
   @Get()

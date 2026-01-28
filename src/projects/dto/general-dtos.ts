@@ -15,7 +15,7 @@ export const ProjectUploadSchema = {
       githubUrl: { type: 'string' },
       projectGoal: { type: 'string' },
       projectOutCome: { type: 'string' },
-      techIds:{type:'array',items:{type:'string'}}
+      techIds: { type: 'array', items: { type: 'string' } },
     },
     required: ['title', 'projectGoal', 'projectOutCome'],
   },

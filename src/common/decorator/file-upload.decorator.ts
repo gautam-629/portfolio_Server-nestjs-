@@ -87,7 +87,7 @@ export const AvatarUpload = () => {
 // Generic image upload decorator
 export const ImageUpload = () => {
   return FileUpload({
-    destination:'./uploads/projects',
+    destination: './uploads/projects',
     allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
     maxFileSize: 8 * 1024 * 1024, // 8MB
     fieldName: 'image',
@@ -108,7 +108,7 @@ export const MultipleFileUpload = (
 
   return applyDecorators(
     UseInterceptors(
-      FilesInterceptor(fieldName, maxCount, { 
+      FilesInterceptor(fieldName, maxCount, {
         storage: diskStorage({
           destination,
           filename: (req, file, cb) => {
