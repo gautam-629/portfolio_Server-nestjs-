@@ -6,7 +6,7 @@ export class RequestLoggerMiddleware implements NestMiddleware {
   private readonly logger = new Logger('HTTP');
 
   use(req: Request, res: Response, next: NextFunction) {
-    const { method, originalUrl, body, headers } = req;
+    const { method, originalUrl, body, headers ,params,query} = req;
 
     // Extract Bearer access token only
     let bearerToken: string | undefined;
@@ -18,6 +18,8 @@ export class RequestLoggerMiddleware implements NestMiddleware {
       `➡️ ${method} ${originalUrl}
     Bearer Access Token: ${bearerToken ?? 'None'}
     Body: ${JSON.stringify(body, null, 2)}
+    params:${JSON.stringify(params)}
+    query:${JSON.stringify(query)}
       `,
     );
 

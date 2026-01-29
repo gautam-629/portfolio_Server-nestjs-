@@ -1,5 +1,5 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNumber, IsOptional, Min } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNumber, IsOptional, IsUUID, Min } from 'class-validator';
 
 export const PictureUploadSchema = {
   schema: {
@@ -33,3 +33,12 @@ export class PaginationQueryDto {
   @Min(1)
   limit?: number;
 }
+export class IdParamDto {
+  @ApiProperty({
+    description: 'The ID of the user to retrieve',
+    example: '2ed22968-9603-4057-8267-60941ee75d34',
+  })
+  @IsUUID()
+  id: string;
+}
+

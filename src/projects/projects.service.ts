@@ -183,8 +183,47 @@ export class ProjectsService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} project`;
+  async findOne(id: string) {
+   
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    try {
+      await queryRunner.startTransaction();
+      const result = await queryRunner.query(
+        `
+        SELECT p.*,
+        json_agg(
+          json_build_object(
+          'techId',t.id,
+          'techName',t.title
+          )
+        ) as techStack,
+         array_agg(pp."imageUrl") as Projectpictures
+         FROM projects p 
+         LEFT JOIN project_tech pt ON pt."projectId"=p.id
+         LEFT JOIN techs t ON pt."techId"=t.id
+         LEFT JOIN project_pictures pp ON pp."ProjectId"=p.id
+         WHERE p.id=$1 AND p."deletedAt" IS NULL
+         GROUP BY P.id
+        `,
+        [id],
+      );
+      if (!result.length) {
+        throw new HttpException('Project Not Found', HttpStatus.NOT_FOUND);
+      }
+      await queryRunner.commitTransaction();
+      console.log(result);
+      return result[0];
+    } catch (error) {
+      console.log(error)
+      await queryRunner.rollbackTransaction();
+      throw new HttpException(
+        `Failed to fetch Project ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   update(id: number, updateProjectDto: UpdateProjectDto) {

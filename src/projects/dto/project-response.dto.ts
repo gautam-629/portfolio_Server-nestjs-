@@ -37,7 +37,6 @@ export class ProjectResponseDto {
   @Expose()
   updatedAt: Date;
 
-  @Expose()
   deletedAt: Date | null;
 
   @Expose()

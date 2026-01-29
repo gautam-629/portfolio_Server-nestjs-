@@ -18,7 +18,7 @@ import { MultipleFileUpload } from 'src/common/decorator/file-upload.decorator';
 import { ProjectUploadSchema } from './dto/general-dtos';
 import { ProjectResponseDto } from './dto/project-response.dto';
 import { Public } from 'src/common/decorator/public.decorator';
-import { PaginationQueryDto } from 'src/common/dto/general-dtos';
+import {  IdParamDto, PaginationQueryDto } from 'src/common/dto/general-dtos';
 
 @Controller('projects')
 export class ProjectsController {
@@ -48,9 +48,11 @@ export class ProjectsController {
     return this.projectsService.findAll(query);
   }
 
+  @Message("Successfully fetch Project")
+  @Public()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.projectsService.findOne(+id);
+  findOne(@Param() params: IdParamDto) {
+    return this.projectsService.findOne(params.id);
   }
 
   @Patch(':id')
